@@ -52,10 +52,9 @@ CREATE POLICY "Админ и директор могут управлять ус
 CREATE POLICY "Мастера видят свои заказы" ON orders
     FOR SELECT USING (
         auth.jwt() ->> 'role' IN ('admin', 'director') OR
-        auth.uid() IN (
-            SELECT master_id FROM masters WHERE id = (
-                SELECT master_id FROM order_masters WHERE order_id = orders.id
-            )
+        created_by = auth.uid() OR
+        id IN (
+            SELECT order_id FROM order_masters WHERE master_id = auth.uid()
         )
     );
 
@@ -68,8 +67,8 @@ CREATE POLICY "Мастера могут обновлять свои заказ�
     FOR UPDATE USING (
         auth.jwt() ->> 'role' IN ('admin', 'director') OR
         created_by = auth.uid() OR
-        auth.uid() IN (
-            SELECT master_id FROM order_masters WHERE order_id = orders.id
+        id IN (
+            SELECT order_id FROM order_masters WHERE master_id = auth.uid()
         )
     );
 
