@@ -66,20 +66,20 @@ INSERT INTO clients (name, phone, car1, car2, vin, notes) VALUES
 ('Андрей Попов', '+79123456796', 'Renault Duster 2019', 'Renault Logan 2016', 'VF1RZ0Y063123456', 'Предпочитает экономичные решения'),
 ('Наталья Козлова', '+79123456797', 'Toyota RAV4 2021', NULL, 'JTBABLHES0123456', 'Семейный автомобиль, важна безопасность');
 
--- Создаем несколько тестовых заказов
+-- Создаем несколько тестовых заказов (с простым JSON)
 INSERT INTO orders (client_id, services, parts_cost, services_cost, status, notes, created_by) VALUES
 ((SELECT id FROM clients WHERE name = 'Иван Петров'), 
-'[{"service_id": (SELECT id FROM services WHERE name = "Замена масла"), "qty": 1, "price": 2000}, {"service_id": (SELECT id FROM services WHERE name = "Замена масляного фильтра"), "qty": 1, "price": 500}]',
+'[{"service_id": "1", "qty": 1, "price": 2000}, {"service_id": "2", "qty": 1, "price": 500}]',
 1500, 2500, 'в_работе', 'Клиент просил использовать качественные материалы', 
 (SELECT id FROM masters WHERE full_name = 'Владимир Чекало' LIMIT 1)),
 
 ((SELECT id FROM clients WHERE name = 'Мария Сидорова'), 
-'[{"service_id": (SELECT id FROM services WHERE name = "Диагностика двигателя"), "qty": 1, "price": 2000}]',
+'[{"service_id": "8", "qty": 1, "price": 2000}]',
 0, 2000, 'диагностика', 'Проверить компрессию и электроннику', 
 (SELECT id FROM masters WHERE full_name = 'Владимир Архипов' LIMIT 1)),
 
 ((SELECT id FROM clients WHERE name = 'Алексей Кузнецов'), 
-'[{"service_id": (SELECT id FROM services WHERE name = "Замена тормозных колодок"), "qty": 2, "price": 3500}]',
+'[{"service_id": "5", "qty": 2, "price": 3500}]',
 8000, 7000, 'ожидание_деталей', 'Ждем поставку колодок с склада', 
 (SELECT id FROM masters WHERE full_name = 'Андрей' LIMIT 1));
 
