@@ -43,6 +43,16 @@ INSERT INTO services (name, price, category, duration_minutes) VALUES
 ('Замена термостата', 2000.00, 'Система охлаждения', 45),
 ('Замена радиатора', 8000.00, 'Система охлаждения', 150);
 
+-- Вставляем пользователей (мастеров и персонал)
+INSERT INTO masters (email, full_name, phone, role) VALUES
+('director@vipauto.ru', 'Владимир Михайлович Орлов', '+79160000001', 'director'),
+('admin@vipauto.ru', 'Роман', '+79160000002', 'admin'),
+('master1@vipauto.ru', 'Владимир Чекало', '+79160000003', 'master'),
+('master2@vipauto.ru', 'Владимир Архипов', '+79160000004', 'master'),
+('master3@vipauto.ru', 'Андрей', '+79160000005', 'master'),
+('master4@vipauto.ru', 'Алексей', '+79160000006', 'master'),
+('master5@vipauto.ru', 'Артём', '+79160000007', 'master');
+
 -- Вставляем тестовых клиентов
 INSERT INTO clients (name, phone, car1, car2, vin, notes) VALUES
 ('Иван Петров', '+79123456789', 'Toyota Camry 2018', 'Honda Civic 2020', 'JTHBE5C21A1234567', 'Постоянный клиент, предпочитает качественное обслуживание'),
@@ -51,7 +61,7 @@ INSERT INTO clients (name, phone, car1, car2, vin, notes) VALUES
 ('Елена Васильева', '+79123456791', 'Hyundai Solaris 2020', NULL, 'KMHDN51GPMA1234567', 'Предпочитает записываться заранее'),
 ('Дмитрий Николаев', '+79123456792', 'Volkswagen Polo 2019', 'Skoda Octavia 2017', 'WVWZZZAUZNP1234567', 'Интересуется установкой доп. оборудования'),
 ('Ольга Петрова', '+79123456793', 'Nissan Qashqai 2018', NULL, 'SJNFAAJ10U1234567', 'Регулярное ТО по регламенту'),
-('Сергей Смирнов', '+79123456794', 'Ford Focus 2017', 'Ford Mondeo 2015', 'WF0BXXGCABAB123456', 'Часто покупает запчасти отдельно'),
+('Сергей Смирнов', '+79123456794', 'Ford Focus 2017', 'Ford Mondeo 2015', 'WF0BXXGCABAB1234567', 'Часто покупает запчасти отдельно'),
 ('Татьяна Иванова', '+79123456795', 'Mazda CX-5 2020', NULL, 'JM0KE2D6A01234567', 'Ценит чистоту в салоне'),
 ('Андрей Попов', '+79123456796', 'Renault Duster 2019', 'Renault Logan 2016', 'VF1RZ0Y0631234567', 'Предпочитает экономичные решения'),
 ('Наталья Козлова', '+79123456797', 'Toyota RAV4 2021', NULL, 'JTBABLHES01234567', 'Семейный автомобиль, важна безопасность');
@@ -59,33 +69,33 @@ INSERT INTO clients (name, phone, car1, car2, vin, notes) VALUES
 -- Создаем несколько тестовых заказов
 INSERT INTO orders (client_id, services, parts_cost, services_cost, status, notes, created_by) VALUES
 ((SELECT id FROM clients WHERE name = 'Иван Петров'), 
- '[{"service_id": (SELECT id FROM services WHERE name = "Замена масла"), "qty": 1, "price": 2000}, {"service_id": (SELECT id FROM services WHERE name = "Замена масляного фильтра"), "qty": 1, "price": 500}]',
- 1500, 2500, 'в_работе', 'Клиент просил использовать качественные материалы', 
- (SELECT id FROM auth.users WHERE full_name = 'Владимир Чекало' LIMIT 1)),
+'[{"service_id": (SELECT id FROM services WHERE name = "Замена масла"), "qty": 1, "price": 2000}, {"service_id": (SELECT id FROM services WHERE name = "Замена масляного фильтра"), "qty": 1, "price": 500}]',
+1500, 2500, 'в_работе', 'Клиент просил использовать качественные материалы', 
+(SELECT id FROM masters WHERE full_name = 'Владимир Чекало' LIMIT 1)),
 
 ((SELECT id FROM clients WHERE name = 'Мария Сидорова'), 
- '[{"service_id": (SELECT id FROM services WHERE name = "Диагностика двигателя"), "qty": 1, "price": 2000}]',
- 0, 2000, 'диагностика', 'Проверить компрессию и электроннику', 
- (SELECT id FROM auth.users WHERE full_name = 'Владимир Архипов' LIMIT 1)),
+'[{"service_id": (SELECT id FROM services WHERE name = "Диагностика двигателя"), "qty": 1, "price": 2000}]',
+0, 2000, 'диагностика', 'Проверить компрессию и электроннику', 
+(SELECT id FROM masters WHERE full_name = 'Владимир Архипов' LIMIT 1)),
 
 ((SELECT id FROM clients WHERE name = 'Алексей Кузнецов'), 
- '[{"service_id": (SELECT id FROM services WHERE name = "Замена тормозных колодок"), "qty": 2, "price": 3500}]',
- 8000, 7000, 'ожидание_деталей', 'Ждем поставку колодок с склада', 
- (SELECT id FROM auth.users WHERE full_name = 'Андрей' LIMIT 1));
+'[{"service_id": (SELECT id FROM services WHERE name = "Замена тормозных колодок"), "qty": 2, "price": 3500}]',
+8000, 7000, 'ожидание_деталей', 'Ждем поставку колодок с склада', 
+(SELECT id FROM masters WHERE full_name = 'Андрей' LIMIT 1));
 
 -- Распределяем мастеров по заказам
 INSERT INTO order_masters (order_id, master_id, percent) VALUES
-('ZA001', (SELECT id FROM auth.users WHERE full_name = 'Владимир Чекало' LIMIT 1), 60.00),
-('ZA001', (SELECT id FROM auth.users WHERE full_name = 'Андрей' LIMIT 1), 40.00),
-('ZA002', (SELECT id FROM auth.users WHERE full_name = 'Владимир Архипов' LIMIT 1), 100.00),
-('ZA003', (SELECT id FROM auth.users WHERE full_name = 'Андрей' LIMIT 1), 70.00),
-('ZA003', (SELECT id FROM auth.users WHERE full_name = 'Алексей' LIMIT 1), 30.00);
+('ZA001', (SELECT id FROM masters WHERE full_name = 'Владимир Чекало' LIMIT 1), 60.00),
+('ZA001', (SELECT id FROM masters WHERE full_name = 'Андрей' LIMIT 1), 40.00),
+('ZA002', (SELECT id FROM masters WHERE full_name = 'Владимир Архипов' LIMIT 1), 100.00),
+('ZA003', (SELECT id FROM masters WHERE full_name = 'Андрей' LIMIT 1), 70.00),
+('ZA003', (SELECT id FROM masters WHERE full_name = 'Алексей' LIMIT 1), 30.00);
 
 -- Создаем несколько продаж запчастей
 INSERT INTO parts_sales (client_name, client_phone, client_id, part_name, part_number, quantity, price, discount, seller_id, notes) VALUES
-('Иван Петров', '+79123456789', (SELECT id FROM clients WHERE name = 'Иван Петров'), 'Масляный фильтр Mann', 'HU716/2X', 2, 800, 100, (SELECT id FROM auth.users WHERE full_name = 'Владимир Чекало' LIMIT 1), 'Клиент попросил скидку'),
-('Мария Сидорова', '+79123456788', (SELECT id FROM clients WHERE name = 'Мария Сидорова'), 'Тормозные колодки Brembo', 'P06021', 1, 3500, 0, (SELECT id FROM auth.users WHERE full_name = 'Владимир Архипов' LIMIT 1), 'Оригинальные запчасти'),
-('Алексей Кузнецов', '+79123456790', (SELECT id FROM clients WHERE name = 'Алексей Кузнецов'), 'Свечи зажигания NGK', 'BKR6EIX', 4, 600, 50, (SELECT id FROM auth.users WHERE full_name = 'Андрей' LIMIT 1), 'Иридиевые свечи');
+('Иван Петров', '+79123456789', (SELECT id FROM clients WHERE name = 'Иван Петров'), 'Масляный фильтр Mann', 'HU716/2X', 2, 800, 100, (SELECT id FROM masters WHERE full_name = 'Владимир Чекало' LIMIT 1), 'Клиент попросил скидку'),
+('Мария Сидорова', '+79123456788', (SELECT id FROM clients WHERE name = 'Мария Сидорова'), 'Тормозные колодки Brembo', 'P06021', 1, 3500, 0, (SELECT id FROM masters WHERE full_name = 'Владимир Архипов' LIMIT 1), 'Оригинальные запчасти'),
+('Алексей Кузнецов', '+79123456790', (SELECT id FROM clients WHERE name = 'Алексей Кузнецов'), 'Свечи зажигания NGK', 'BKR6EIX', 4, 600, 50, (SELECT id FROM masters WHERE full_name = 'Андрей' LIMIT 1), 'Иридиевые свечи');
 
 -- Создаем тестовые долги
 INSERT INTO debts (client_id, order_id, amount, remaining, notes) VALUES
@@ -95,17 +105,17 @@ INSERT INTO debts (client_id, order_id, amount, remaining, notes) VALUES
 
 -- Создаем тестовые оплаты
 INSERT INTO payments (order_id, amount, type, created_by, notes) VALUES
-('ZA001', 4000, 'карта', (SELECT id FROM auth.users WHERE full_name = 'Роман' LIMIT 1), 'Предоплата 50%'),
-('ZA002', 2000, 'наличные', (SELECT id FROM auth.users WHERE full_name = 'Роман' LIMIT 1), 'Полная оплата диагностики');
+('ZA001', 4000, 'карта', (SELECT id FROM masters WHERE full_name = 'Роман' LIMIT 1), 'Предоплата 50%'),
+('ZA002', 2000, 'наличные', (SELECT id FROM masters WHERE full_name = 'Роман' LIMIT 1), 'Полная оплата диагностики');
 
 INSERT INTO payments (parts_sale_id, amount, type, created_by, notes) VALUES
-((SELECT id FROM parts_sales WHERE client_name = 'Иван Петров' LIMIT 1), 1500, 'карта', (SELECT id FROM auth.users WHERE full_name = 'Владимир Чекало' LIMIT 1), 'Оплата масляного фильтра'),
-((SELECT id FROM parts_sales WHERE client_name = 'Мария Сидорова' LIMIT 1), 3500, 'перевод', (SELECT id FROM auth.users WHERE full_name = 'Владимир Архипов' LIMIT 1), 'Оплата через СБЕР');
+((SELECT id FROM parts_sales WHERE client_name = 'Иван Петров' LIMIT 1), 1500, 'карта', (SELECT id FROM masters WHERE full_name = 'Владимир Чекало' LIMIT 1), 'Оплата масляного фильтра'),
+((SELECT id FROM parts_sales WHERE client_name = 'Мария Сидорова' LIMIT 1), 3500, 'перевод', (SELECT id FROM masters WHERE full_name = 'Владимир Архипов' LIMIT 1), 'Оплата через СБЕР');
 
 -- Создаем тестовые бонусы
 INSERT INTO bonuses (director_id, order_id, amount, comment) VALUES
-((SELECT id FROM auth.users WHERE full_name = 'Владимир Михайлович Орлов' LIMIT 1), 'ZA001', 1000, 'Срочный заказ, выполнен в срок'),
-((SELECT id FROM auth.users WHERE full_name = 'Владимир Михайлович Орлов' LIMIT 1), 'ZA002', 500, 'Сложная диагностика, найдена редкая неисправность');
+((SELECT id FROM masters WHERE full_name = 'Владимир Михайлович Орлов' LIMIT 1), 'ZA001', 1000, 'Срочный заказ, выполнен в срок'),
+((SELECT id FROM masters WHERE full_name = 'Владимир Михайлович Орлов' LIMIT 1), 'ZA002', 500, 'Сложная диагностика, найдена редкая неисправность');
 
 -- Обновляем статистику
 ANALYZE;

@@ -141,7 +141,7 @@ $$ LANGUAGE plpgsql;
 -- Создаем таблицу уведомлений если ее нет
 CREATE TABLE IF NOT EXISTS notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES masters(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     message TEXT,
     type VARCHAR(50),
@@ -215,20 +215,20 @@ RETURNS TABLE(
 BEGIN
     RETURN QUERY
     SELECT 
-        u.id as master_id,
-        u.full_name as master_name,
+        m.id as master_id,
+        m.full_name as master_name,
         COUNT(DISTINCT o.id) as orders_count,
         COALESCE(SUM(o.total), 0) as total_revenue,
         COALESCE(SUM(s.amount), 0) as salary_amount
-    FROM auth.users u
-    LEFT JOIN order_masters om ON u.id = om.master_id
+    FROM masters m
+    LEFT JOIN order_masters om ON m.id = om.master_id
     LEFT JOIN orders o ON om.order_id = o.id
-    LEFT JOIN salaries s ON u.id = s.master_id AND o.id = s.order_id
+    LEFT JOIN salaries s ON m.id = s.master_id AND o.id = s.order_id
     WHERE 
-        u.role = 'master' AND
+        m.role = 'master' AND
         (start_date IS NULL OR o.created_at >= start_date) AND
         (end_date IS NULL OR o.created_at <= end_date)
-    GROUP BY u.id, u.full_name
+    GROUP BY m.id, m.full_name
     ORDER BY total_revenue DESC
     LIMIT limit_count;
 END;

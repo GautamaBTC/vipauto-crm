@@ -1,4 +1,5 @@
 -- Включаем RLS для всех таблиц
+ALTER TABLE masters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
@@ -8,6 +9,15 @@ ALTER TABLE debts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE salaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bonuses ENABLE ROW LEVEL SECURITY;
+
+-- Политики для мастеров
+CREATE POLICY "Все видят список мастеров" ON masters
+    FOR SELECT USING (true);
+
+CREATE POLICY "Только директор может управлять мастерами" ON masters
+    FOR ALL USING (
+        auth.jwt() ->> 'role' = 'director'
+    );
 
 -- Политики для клиентов
 CREATE POLICY "Все пользователи могут читать клиентов" ON clients
@@ -43,7 +53,9 @@ CREATE POLICY "Мастера видят свои заказы" ON orders
     FOR SELECT USING (
         auth.jwt() ->> 'role' IN ('admin', 'director') OR
         auth.uid() IN (
-            SELECT master_id FROM order_masters WHERE order_id = orders.id
+            SELECT master_id FROM masters WHERE id = (
+                SELECT master_id FROM order_masters WHERE order_id = orders.id
+            )
         )
     );
 
@@ -55,6 +67,7 @@ CREATE POLICY "Мастера могут создавать заказы" ON ord
 CREATE POLICY "Мастера могут обновлять свои заказы" ON orders
     FOR UPDATE USING (
         auth.jwt() ->> 'role' IN ('admin', 'director') OR
+        created_by = auth.uid() OR
         auth.uid() IN (
             SELECT master_id FROM order_masters WHERE order_id = orders.id
         )
