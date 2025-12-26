@@ -62,7 +62,7 @@
 ### 1. Клонирование и установка
 ```bash
 # Клонируем репозиторий
-git clone https://github.com/your-username/vipauto-crm.git
+git clone https://github.com/GautamaBTC/vipauto-crm.git
 cd vipauto-crm
 
 # Устанавливаем зависимости
@@ -197,7 +197,7 @@ vipauto-crm/
 │   └── .env.example
 ├── .github/workflows/           # GitHub Actions
 ├── vercel.json                 # Vercel конфиг
-├── render.yaml                 # Render конфиг
+├── render.yaml                 # Render конф
 └── README.md
 ```
 
@@ -439,7 +439,7 @@ supabase db diff --schema public
 - [Развертывание](./deployment-guide.md)
 
 ### Контакты
-- GitHub Issues: https://github.com/your-username/vipauto-crm/issues
+- GitHub Issues: https://github.com/GautamaBTC/vipauto-crm/issues
 - Email: support@vipauto-crm.ru
 - Telegram: @vipauto_support
 
