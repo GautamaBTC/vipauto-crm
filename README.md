@@ -79,6 +79,10 @@ cd ..
 
 # Настраиваем переменные окружения
 cp .env.example .env
+
+# Используйте следующие данные для подключения к Supabase:
+# URL проекта: https://sb_publishable_DKqHsjiF2jhO4UIOOYsZOw_k6BhfJOs.supabase.co
+# Ключи можно найти в настройках проекта: https://supabase.com/dashboard/project
 ```
 
 ### 3. Конфигурация переменных
